@@ -116,6 +116,10 @@ void BoundedStream::Flush()
 
 void BoundedStream::Close()
 {
+    if (!mClosed)
+    {
+        mInner->Flush();
+    }
     mClosed = true;
 }
 
