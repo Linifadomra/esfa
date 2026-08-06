@@ -22,6 +22,9 @@ public:
     void RegisterReader(std::string typeKey, ParseFn fn);
     void RegisterWriter(std::string typeKey, ExportFn fn);
 
+    void OverrideReader(std::string typeKey, ParseFn fn);
+    void OverrideWriter(std::string typeKey, ExportFn fn);
+
     std::shared_ptr<ParsedAsset> Parse(
         const std::string& typeKey, esfa::binary::Reader& reader,
         const AssetMeta& meta, AssetContext& ctx) const;

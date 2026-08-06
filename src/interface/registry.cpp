@@ -40,4 +40,14 @@ void Registry::Export(
     it->second(writer, std::move(asset), ctx);
 }
 
+void Registry::OverrideReader(std::string typeKey, ParseFn fn)
+{
+    mReaders.insert_or_assign(std::move(typeKey), std::move(fn));
+}
+
+void Registry::OverrideWriter(std::string typeKey, ExportFn fn)
+{
+    mWriters.insert_or_assign(std::move(typeKey), std::move(fn));
+}
+
 }
