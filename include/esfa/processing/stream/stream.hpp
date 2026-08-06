@@ -32,7 +32,8 @@ public:
 	virtual void Close() = 0;
 
 protected:
-	uint64_t baseAddress;
+    void SetBaseAddress(uint64_t addr) { baseAddress = addr; }
+	uint64_t baseAddress = 0;
 };
 
 }

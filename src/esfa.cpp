@@ -13,9 +13,10 @@ std::shared_ptr<interface::ParsedAsset> Processor::ParseAsset(
     auto fileStream = std::make_shared<stream::FileStream>(
         meta.sourceFile, stream::FileMode::Read);
 
-    fileStream->Seek(static_cast<int64_t>(meta.offset), stream::SeekOffsetType::Start);
+    auto bounded = std::make_shared<stream::BoundedStream>(
+        fileStream, meta.offset, meta.size);
 
-    binary::Reader reader(fileStream);
+    binary::Reader reader(bounded);
     reader.SetEndianness(sourceEndianness);
     return mRegistry.Parse(typeKey, reader, meta, ctx);
 }
@@ -25,7 +26,8 @@ void Processor::ExportAsset(
     std::shared_ptr<interface::ParsedAsset> asset,
     const std::filesystem::path& destFile,
     std::any& ctx,
-    bit::Endianness targetEndianness)
+    bit::Endianness targetEndianness,
+    uint64_t maxSize)
 {
     // todo: .tmp file left on disk in case of failure, wasteful
     auto tempFile = destFile;
@@ -35,7 +37,10 @@ void Processor::ExportAsset(
         auto fileStream = std::make_shared<stream::FileStream>(
             tempFile, stream::FileMode::Write);
 
-        binary::Writer writer(fileStream);
+        auto bounded = std::make_shared<stream::BoundedStream>(
+            fileStream, 0, maxSize);
+
+        binary::Writer writer(bounded);
         writer.SetEndianness(targetEndianness);
         mRegistry.Export(typeKey, writer, std::move(asset), ctx);
         writer.Close();

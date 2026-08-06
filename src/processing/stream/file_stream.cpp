@@ -40,6 +40,7 @@ FileStream::FileStream(const std::filesystem::path& path, FileMode mode)
         throw std::runtime_error(
             "FileStream: failed to open '" + mPath.string() + "'");
     }
+    SetBaseAddress(0);
 }
 
 FileStream::~FileStream()

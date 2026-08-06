@@ -3,6 +3,7 @@
 
 #include "esfa/interface/registry.hpp"
 #include "esfa/interface/asset.hpp"
+#include "esfa/processing/stream/bounded_stream.hpp"
 
 namespace esfa {
 
@@ -21,7 +22,8 @@ public:
         std::shared_ptr<interface::ParsedAsset> asset,
         const std::filesystem::path& destFile,
         std::any& ctx,
-        bit::Endianness targetEndianness);
+        bit::Endianness targetEndianness,
+        uint64_t maxSize = std::numeric_limits<uint64_t>::max());
 
 private:
     interface::Registry mRegistry;
