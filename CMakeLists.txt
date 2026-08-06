@@ -29,6 +29,7 @@ add_library(processing ${ESFA_LIB_TYPE}
     ${ESFA_SRC}/processing/binary/writer.cpp
     # stream
     ${ESFA_SRC}/processing/stream/file_stream.cpp
+    ${ESFA_SRC}/processing/stream/bounded_stream.cpp
 )
 
 target_include_directories(processing PUBLIC ${ESFA_PUBLIC_INCLUDES} PRIVATE ${ESFA_SRC}/processing)
