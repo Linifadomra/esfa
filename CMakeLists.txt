@@ -11,9 +11,9 @@ option(BUILD_SHARED_LIBS "Build ESFA as a shared library" OFF)
 option(ESFA_BUILD_TESTS  "Build ESFA tests"               OFF)
 
 if(BUILD_SHARED_LIBS)
-    set(ESFA_LIB_TYPE STATIC)
-else()
     set(ESFA_LIB_TYPE SHARED)
+else()
+    set(ESFA_LIB_TYPE STATIC)
 endif()
 
 # == Includes / Building ==
