@@ -1,4 +1,3 @@
-// include/esfa/esfa.hpp
 #pragma once
 
 #include "esfa/interface/registry.hpp"

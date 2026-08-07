@@ -33,6 +33,14 @@ public:
         const std::string& typeKey, esfa::binary::Writer& writer,
         std::shared_ptr<ParsedAsset> asset, AssetContext& ctx) const;
 
+    inline const std::unordered_map<std::string, ParseFn>& getReaders() const {
+        return mReaders;
+    }
+
+    inline const std::unordered_map<std::string, ExportFn>& getWriters() const {
+        return mWriters;
+    }
+
 private:
     std::unordered_map<std::string, ParseFn> mReaders;
     std::unordered_map<std::string, ExportFn> mWriters;
