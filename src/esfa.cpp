@@ -29,24 +29,35 @@ void Processor::ExportAsset(
     bit::Endianness targetEndianness,
     uint64_t maxSize)
 {
-    // todo: .tmp file left on disk in case of failure, wasteful
+    const auto parent = destFile.parent_path();
+
+    if (!parent.empty())
+    {
+        std::filesystem::create_directories(parent);
+    }
+
     auto tempFile = destFile;
     tempFile += ".tmp";
 
-    {
-        auto fileStream = std::make_shared<stream::FileStream>(
-            tempFile, stream::FileMode::Write);
+    try {
+        {
+            auto fileStream = std::make_shared<stream::FileStream>(
+                tempFile, stream::FileMode::Write);
 
-        auto bounded = std::make_shared<stream::BoundedStream>(
-            fileStream, 0, maxSize);
+            auto bounded = std::make_shared<stream::BoundedStream>(
+                fileStream, 0, maxSize);
 
-        binary::Writer writer(bounded);
-        writer.SetEndianness(targetEndianness);
-        mRegistry.Export(typeKey, writer, std::move(asset), ctx);
-        writer.Close();
+            binary::Writer writer(bounded);
+            writer.SetEndianness(targetEndianness);
+            mRegistry.Export(typeKey, writer, std::move(asset), ctx);
+            writer.Close();
+        }
+        std::filesystem::rename(tempFile, destFile);
+    } catch(...) {
+        std::error_code ec;
+        std::filesystem::remove(tempFile, ec);
+        throw;
     }
-
-    std::filesystem::rename(tempFile, destFile);
 }
 
 }

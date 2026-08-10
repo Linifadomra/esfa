@@ -38,7 +38,7 @@ public:
     }
 
     bool ContainsWriter(const std::string& id) const {
-        return mReaders.contains(id);
+        return mWriters.contains(id);
     }
 
 private:
