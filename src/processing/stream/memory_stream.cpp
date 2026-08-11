@@ -67,7 +67,13 @@ void MemoryStream::Read(char* dest, size_t length)
     }
     if (mPosition + length > mBuffer.size())
     {
-        throw std::runtime_error("MemoryStream::Read: short read (past end of buffer)");
+        std::string msg =
+            "MemoryStream::Read: position " + std::to_string(mPosition) +
+            " + length " + std::to_string(length) +
+            " = " + std::to_string(mPosition + length) +
+            " > buffer size " + std::to_string(mBuffer.size());
+
+        throw std::runtime_error(msg);
     }
     std::memcpy(dest, mBuffer.data() + mPosition, length);
     mPosition += length;

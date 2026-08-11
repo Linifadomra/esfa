@@ -20,6 +20,10 @@ struct AssetMeta {
     uint32_t offset;
     uint32_t size;
     std::filesystem::path sourceFile;
+
+    // Allow asset to grow during swap (e.g., uncompressed formats)
+    // If not set, defaults to input size
+    std::optional<uint64_t> maxOutputSize;
 };
 
 }
