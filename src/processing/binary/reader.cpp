@@ -128,7 +128,7 @@ uint64_t Reader::ReadUInt64()
 
 float Reader::ReadSingle()
 {
-	float result = NAN;
+	float result;
 
 	stream->Read((char*)&result, sizeof(float));
 
@@ -140,9 +140,6 @@ float Reader::ReadSingle()
 		dst[3] = src[0]; dst[2] = src[1]; dst[1] = src[2]; dst[0] = src[3];
 		result = tmp;
 	}
-
-	if (std::isnan(result))
-		throw std::runtime_error("Reader::ReadSingle(): Error reading stream");
 
 	return result;
 }
