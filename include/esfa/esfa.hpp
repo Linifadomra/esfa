@@ -8,7 +8,9 @@ namespace esfa {
 
 class Processor {
 public:
-    interface::Registry& GetRegistry() { return mRegistry; }
+    explicit Processor(const interface::Registry& registry) : mRegistry(registry) {}
+
+    const interface::Registry& GetRegistry() const { return mRegistry; }
 
     std::shared_ptr<interface::ParsedAsset> ParseAsset(
         const std::string& typeKey,
@@ -25,7 +27,7 @@ public:
         uint64_t maxSize = std::numeric_limits<uint64_t>::max());
 
 private:
-    interface::Registry mRegistry;
+    const interface::Registry& mRegistry;
 };
 
 }
