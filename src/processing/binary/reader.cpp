@@ -1,4 +1,3 @@
-#include <cmath>
 #include <stdexcept>
 
 #include "esfa/processing/binary/reader.hpp"
@@ -128,7 +127,7 @@ uint64_t Reader::ReadUInt64()
 
 float Reader::ReadSingle()
 {
-	float result;
+	float result = 0.f;
 
 	stream->Read((char*)&result, sizeof(float));
 
@@ -146,7 +145,7 @@ float Reader::ReadSingle()
 
 double Reader::ReadDouble()
 {
-	double result = NAN;
+	double result = 0.0;
 
 	stream->Read((char*)&result, sizeof(double));
 
@@ -159,9 +158,6 @@ double Reader::ReadDouble()
 		dst[3] = src[4]; dst[2] = src[5]; dst[1] = src[6]; dst[0] = src[7];
 		result = tmp;
 	}
-
-	if (std::isnan(result))
-		throw std::runtime_error("Reader::ReadDouble(): Error reading stream");
 
 	return result;
 }

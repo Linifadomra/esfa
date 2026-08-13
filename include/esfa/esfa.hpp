@@ -8,15 +8,9 @@ namespace esfa {
 
 class Processor {
 public:
-    explicit Processor(const interface::Registry& registry)
-        : mRegistry(registry)
-    {
-    }
+    explicit Processor(const interface::Registry& registry) : mRegistry(registry) {}
 
-    const interface::Registry& GetRegistry()
-    {
-        return mRegistry;
-    }
+    const interface::Registry& GetRegistry() const { return mRegistry; }
 
     std::shared_ptr<interface::ParsedAsset> ParseAsset(
         const std::string& typeKey,
