@@ -18,6 +18,7 @@ public:
 	Writer(std::shared_ptr<esfa::stream::Stream> nStream);
 
 	void SetEndianness(esfa::bit::Endianness endianness);
+	esfa::bit::Endianness GetEndianness() const;
 
 	std::shared_ptr<esfa::stream::Stream> GetStream();
 	uint64_t GetBaseAddress();

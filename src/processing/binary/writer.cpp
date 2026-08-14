@@ -17,6 +17,12 @@ void Writer::SetEndianness(esfa::bit::Endianness endianness)
 	this->endianness = endianness;
 }
 
+esfa::bit::Endianness Writer::GetEndianness() const
+{
+	return this->endianness;
+}
+
+
 void Writer::Close()
 {
 	stream->Close();
