@@ -1,6 +1,7 @@
 #include "esfa/interface/registry.hpp"
 
 #include <stdexcept>
+#include <utility>
 
 namespace esfa::interface {
 

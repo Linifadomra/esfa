@@ -3,6 +3,8 @@
 #include <any>
 #include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "esfa/interface/asset.hpp"
 #include "esfa/processing/binary/writer.hpp"

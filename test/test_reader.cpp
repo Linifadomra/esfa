@@ -1,9 +1,10 @@
 #include <cassert>
 #include <cstdint>
-#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <stdexcept>
 
 #include "esfa/processing/binary/reader.hpp"
 #include "esfa/processing/stream/file_stream.hpp"

@@ -55,5 +55,6 @@ SOVERSION ${PROJECT_VERSION_MAJOR})
 # binary / tests
 
 if(ESFA_BUILD_TESTS)
+    enable_testing()
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 endif()
