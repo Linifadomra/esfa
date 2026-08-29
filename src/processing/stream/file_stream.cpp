@@ -21,7 +21,7 @@ std::ios::openmode ToOpenMode(FileMode mode)
 }  // anonymous namespace
 
 FileStream::FileStream(const std::filesystem::path& path, FileMode mode)
-    : mPath(path), mMode(mode)
+    : mPath(path)
 {
     if (mode == FileMode::ReadWrite && !std::filesystem::exists(mPath))
     {

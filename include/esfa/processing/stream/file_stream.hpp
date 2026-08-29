@@ -33,7 +33,6 @@ public:
 private:
     std::filesystem::path mPath;
     std::fstream mFile;
-    FileMode mMode;
     bool mClosed = false;
 
     void EnsureOpen() const;
