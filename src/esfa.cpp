@@ -21,6 +21,21 @@ std::shared_ptr<interface::ParsedAsset> Processor::ParseAsset(
     return mRegistry.Parse(typeKey, reader, meta, ctx);
 }
 
+std::shared_ptr<interface::ParsedAsset> Processor::ParseAsset(
+    const std::string& typeKey,
+    std::shared_ptr<stream::Stream> inStream,
+    const interface::AssetMeta& meta,
+    std::any& ctx,
+    bit::Endianness sourceEndianness)
+{
+    auto bounded = std::make_shared<stream::BoundedStream>(
+        inStream, meta.offset, meta.size);
+
+    binary::Reader reader(bounded);
+    reader.SetEndianness(sourceEndianness);
+    return mRegistry.Parse(typeKey, reader, meta, ctx);
+}
+
 void Processor::ExportAsset(
     const std::string& typeKey,
     std::shared_ptr<interface::ParsedAsset> asset,
@@ -58,6 +73,21 @@ void Processor::ExportAsset(
         std::filesystem::remove(tempFile, ec);
         throw;
     }
+}
+
+void Processor::ExportAsset(
+    const std::string& typeKey,
+    std::shared_ptr<interface::ParsedAsset> asset,
+    std::shared_ptr<stream::Stream> outStream,
+    std::any& ctx,
+    bit::Endianness targetEndianness,
+    uint64_t maxSize)
+{
+    auto bounded = std::make_shared<stream::BoundedStream>(outStream, 0, maxSize);
+    binary::Writer writer(bounded);
+    writer.SetEndianness(targetEndianness);
+    mRegistry.Export(typeKey, writer, std::move(asset), ctx);
+    writer.Close();
 }
 
 }

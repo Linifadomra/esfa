@@ -18,6 +18,13 @@ public:
         std::any& ctx,
         esfa::bit::Endianness sourceEndianness);
 
+    std::shared_ptr<interface::ParsedAsset> ParseAsset(
+        const std::string& typeKey,
+        std::shared_ptr<stream::Stream> inStream,
+        const interface::AssetMeta& meta,
+        std::any& ctx,
+        bit::Endianness sourceEndianness);
+
     void ExportAsset(
         const std::string& typeKey,
         std::shared_ptr<interface::ParsedAsset> asset,
@@ -27,6 +34,13 @@ public:
         uint64_t maxSize =
             std::numeric_limits<uint64_t>::max());
 
+    void ExportAsset(
+        const std::string& typeKey,
+        std::shared_ptr<interface::ParsedAsset> asset,
+        std::shared_ptr<stream::Stream> outStream,
+        std::any& ctx,
+        bit::Endianness targetEndianness,
+        uint64_t maxSize);
 private:
     const interface::Registry& mRegistry;
 };
