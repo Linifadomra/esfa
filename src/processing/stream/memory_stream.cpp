@@ -29,18 +29,20 @@ uint64_t MemoryStream::GetLength()
 void MemoryStream::Seek(int64_t offset, SeekOffsetType seekType)
 {
     int64_t base = 0;
-    switch (seekType)
+    if (seekType == SeekOffsetType::Start)
     {
-    case SeekOffsetType::Start:
         base = 0;
-        break;
-    case SeekOffsetType::Current:
+    }
+    else if (seekType == SeekOffsetType::Current)
+    {
         base = static_cast<int64_t>(mPosition);
-        break;
-    case SeekOffsetType::End:
+    }
+    else if (seekType == SeekOffsetType::End)
+    {
         base = static_cast<int64_t>(mBuffer.size());
-        break;
-    default:
+    }
+    else
+    {
         throw std::invalid_argument("MemoryStream::Seek: unknown SeekOffsetType");
     }
 
