@@ -38,18 +38,20 @@ void BoundedStream::Seek(int64_t offset, SeekOffsetType seekType)
     EnsureOpen();
 
     int64_t target = 0;
-    switch (seekType)
+    if (seekType == SeekOffsetType::Start)
     {
-    case SeekOffsetType::Start:
         target = offset;
-        break;
-    case SeekOffsetType::Current:
+    }
+    else if (seekType == SeekOffsetType::Current)
+    {
         target = static_cast<int64_t>(mPosition) + offset;
-        break;
-    case SeekOffsetType::End:
+    }
+    else if (seekType == SeekOffsetType::End)
+    {
         target = static_cast<int64_t>(mSize) + offset;
-        break;
-    default:
+    }
+    else
+    {
         throw std::invalid_argument("BoundedStream::Seek: unknown SeekOffsetType");
     }
 

@@ -6,13 +6,16 @@ namespace {
 
 std::ios::openmode ToOpenMode(FileMode mode)
 {
-    switch (mode)
+    if (mode == FileMode::Read)
     {
-    case FileMode::Read:
         return std::ios::in | std::ios::binary;
-    case FileMode::Write:
+    }
+    if (mode == FileMode::Write)
+    {
         return std::ios::out | std::ios::binary | std::ios::trunc;
-    case FileMode::ReadWrite:
+    }
+    if (mode == FileMode::ReadWrite)
+    {
         return std::ios::in | std::ios::out | std::ios::binary;
     }
     throw std::invalid_argument("FileStream: unknown FileMode");
@@ -85,19 +88,21 @@ void FileStream::Seek(int64_t offset, SeekOffsetType seekType)
 {
     EnsureOpen();
 
-    std::ios::seekdir dir;
-    switch (seekType)
+    std::ios::seekdir dir = std::ios::beg;
+    if (seekType == SeekOffsetType::Start)
     {
-    case SeekOffsetType::Start:
         dir = std::ios::beg;
-        break;
-    case SeekOffsetType::Current:
+    }
+    else if (seekType == SeekOffsetType::Current)
+    {
         dir = std::ios::cur;
-        break;
-    case SeekOffsetType::End:
+    }
+    else if (seekType == SeekOffsetType::End)
+    {
         dir = std::ios::end;
-        break;
-    default:
+    }
+    else
+    {
         throw std::invalid_argument("FileStream::Seek: unknown SeekOffsetType");
     }
 
