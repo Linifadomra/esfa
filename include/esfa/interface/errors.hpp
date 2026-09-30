@@ -8,24 +8,28 @@ struct Error : std::runtime_error {
 };
 
 struct UnknownFormatError : Error {
-    UnknownFormatError(std::string kind, std::string format)
-        : Error("esfa::Registry: no " + kind + " registered for type '" + format + "'"),
-          format(std::move(format)) {}
+    UnknownFormatError(std::string kind_, std::string format_)
+        : Error("esfa::Registry: no " + kind_ + " registered for type '" + format_ + "'"),
+          kind(std::move(kind_)),
+          format(std::move(format_)) {}
+    std::string kind;
     std::string format;
 };
 
 struct SwapFailureError : Error {
-    SwapFailureError(std::string format, std::string reason)
-        : Error("esfa::Registry: " + format + " failed to swap: '" + reason + "'"),
-          format(std::move(format)) {}
+    SwapFailureError(std::string format_, std::string reason_)
+        : Error("esfa::Registry: " + format_ + " failed to swap: '" + reason_ + "'"),
+          format(std::move(format_)),
+          reason(std::move(reason_)) {}
     std::string format;
+    std::string reason;
 };
 
 struct DuplicateError : Error {
-    DuplicateError(std::string kind, std::string format)
-        : Error("There is already a " + kind + " registered for format: " + format),
-          kind(std::move(kind)),
-          format(std::move(format)) {}
+    DuplicateError(std::string kind_, std::string format_)
+        : Error("There is already a " + kind_ + " registered for format: " + format_),
+          kind(std::move(kind_)),
+          format(std::move(format_)) {}
     std::string kind;
     std::string format;
 };
