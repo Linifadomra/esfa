@@ -1,8 +1,18 @@
 #include "esfa/processing/stream/file_stream.hpp"
+#include "esfa/interface/errors.hpp"
 
 namespace esfa::stream {
 
 namespace {
+
+using esfa::StreamError;
+using esfa::StreamErrorKind;
+using esfa::StreamType;
+
+[[noreturn]] void Fail(StreamErrorKind kind, std::string message)
+{
+    throw StreamError(StreamType::File, kind, std::move(message));
+}
 
 std::ios::openmode ToOpenMode(FileMode mode)
 {
@@ -28,8 +38,7 @@ FileStream::FileStream(const std::filesystem::path& path, FileMode mode)
         std::ofstream create(mPath, std::ios::binary);
         if (!create.is_open())
         {
-            throw std::runtime_error(
-                "FileStream: failed to create '" + mPath.string() + "'");
+            Fail(StreamErrorKind::Open, "failed to create '" + mPath.string() + "'");
         }
         create.close();
     }
@@ -37,29 +46,21 @@ FileStream::FileStream(const std::filesystem::path& path, FileMode mode)
     mFile.open(mPath, ToOpenMode(mode));
     if (!mFile.is_open())
     {
-        throw std::runtime_error(
-            "FileStream: failed to open '" + mPath.string() + "'");
+        Fail(StreamErrorKind::Open, "failed to open '" + mPath.string() + "'");
     }
     SetBaseAddress(0);
 }
 
 FileStream::~FileStream()
 {
-    try
-    {
-        Close();
-    }
-    catch (...)
-    {
-    }
+    try { Close(); } catch (...) {}
 }
 
 void FileStream::EnsureOpen() const
 {
     if (mClosed || !mFile.is_open())
     {
-        throw std::runtime_error(
-            "FileStream: operation on closed stream '" + mPath.string() + "'");
+        Fail(StreamErrorKind::Closed, "operation on closed stream '" + mPath.string() + "'");
     }
 }
 
@@ -74,8 +75,7 @@ uint64_t FileStream::GetLength()
 
     if (end < 0)
     {
-        throw std::runtime_error(
-            "FileStream: GetLength failed on '" + mPath.string() + "'");
+        Fail(StreamErrorKind::Seek, "GetLength failed on '" + mPath.string() + "'");
     }
 
     return static_cast<uint64_t>(end);
@@ -88,15 +88,9 @@ void FileStream::Seek(int64_t offset, SeekOffsetType seekType)
     std::ios::seekdir dir;
     switch (seekType)
     {
-    case SeekOffsetType::Start:
-        dir = std::ios::beg;
-        break;
-    case SeekOffsetType::Current:
-        dir = std::ios::cur;
-        break;
-    case SeekOffsetType::End:
-        dir = std::ios::end;
-        break;
+    case SeekOffsetType::Start:   dir = std::ios::beg; break;
+    case SeekOffsetType::Current: dir = std::ios::cur; break;
+    case SeekOffsetType::End:     dir = std::ios::end; break;
     default:
         throw std::invalid_argument("FileStream::Seek: unknown SeekOffsetType");
     }
@@ -106,8 +100,7 @@ void FileStream::Seek(int64_t offset, SeekOffsetType seekType)
 
     if (mFile.fail())
     {
-        throw std::out_of_range(
-            "FileStream::Seek: seek failed on '" + mPath.string() + "'");
+        Fail(StreamErrorKind::Seek, "seek failed on '" + mPath.string() + "'");
     }
 }
 
@@ -125,8 +118,10 @@ void FileStream::Read(char* dest, size_t length)
     mFile.read(dest, static_cast<std::streamsize>(length));
     if (static_cast<size_t>(mFile.gcount()) != length)
     {
-        throw std::runtime_error(
-            "FileStream::Read: short read on '" + mPath.string() + "'");
+        Fail(StreamErrorKind::EndOfStream,
+             "short read on '" + mPath.string() + "': requested " +
+             std::to_string(length) + " bytes, got " +
+             std::to_string(mFile.gcount()));
     }
 }
 
@@ -138,8 +133,7 @@ int8_t FileStream::ReadByte()
     mFile.read(&byte, 1);
     if (mFile.gcount() != 1)
     {
-        throw std::runtime_error(
-            "FileStream::ReadByte: read past end of '" + mPath.string() + "'");
+        Fail(StreamErrorKind::EndOfStream, "read past end of '" + mPath.string() + "'");
     }
 
     return static_cast<int8_t>(byte);
@@ -152,8 +146,7 @@ void FileStream::Write(char* srcBuffer, size_t length)
     mFile.write(srcBuffer, static_cast<std::streamsize>(length));
     if (mFile.fail())
     {
-        throw std::runtime_error(
-            "FileStream::Write: short write on '" + mPath.string() + "'");
+        Fail(StreamErrorKind::Write, "short write on '" + mPath.string() + "'");
     }
 }
 

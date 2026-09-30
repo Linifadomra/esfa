@@ -1,8 +1,23 @@
 #include "esfa/processing/stream/bounded_stream.hpp"
+#include "esfa/interface/errors.hpp"
 
 #include <stdexcept>
+#include <string>
 
 namespace esfa::stream {
+
+namespace {
+
+using esfa::StreamError;
+using esfa::StreamErrorKind;
+using esfa::StreamType;
+
+[[noreturn]] void Fail(StreamErrorKind kind, std::string message)
+{
+    throw StreamError(StreamType::Bounded, kind, std::move(message));
+}
+
+}  // anonymous namespace
 
 BoundedStream::BoundedStream(std::shared_ptr<Stream> inner, uint64_t start, uint64_t size)
     : mInner(std::move(inner)), mStart(start), mSize(size)
@@ -18,7 +33,7 @@ void BoundedStream::EnsureOpen() const
 {
     if (mClosed)
     {
-        throw std::runtime_error("BoundedStream: operation on closed stream");
+        Fail(StreamErrorKind::Closed, "operation on closed stream");
     }
 }
 
@@ -55,7 +70,9 @@ void BoundedStream::Seek(int64_t offset, SeekOffsetType seekType)
 
     if (target < 0 || static_cast<uint64_t>(target) > mSize)
     {
-        throw std::out_of_range("BoundedStream::Seek: offset out of bounds for asset window");
+        Fail(StreamErrorKind::Seek,
+             "offset " + std::to_string(target) + " out of bounds for window of size " +
+             std::to_string(mSize));
     }
 
     mPosition = static_cast<uint64_t>(target);
@@ -74,7 +91,10 @@ void BoundedStream::Read(char* dest, size_t length)
 
     if (mPosition + length > mSize)
     {
-        throw std::out_of_range("BoundedStream::Read: read past end of asset window");
+        Fail(StreamErrorKind::EndOfStream,
+             "read of " + std::to_string(length) + " bytes at position " +
+             std::to_string(mPosition) + " passes end of window (size " +
+             std::to_string(mSize) + ")");
     }
 
     SyncInnerPosition();
@@ -95,7 +115,10 @@ void BoundedStream::Write(char* srcBuffer, size_t length)
 
     if (mPosition + length > mSize)
     {
-        throw std::out_of_range("BoundedStream::Write: write past end of asset window");
+        Fail(StreamErrorKind::EndOfStream,
+             "write of " + std::to_string(length) + " bytes at position " +
+             std::to_string(mPosition) + " passes end of window (size " +
+             std::to_string(mSize) + ")");
     }
 
     SyncInnerPosition();

@@ -1,4 +1,5 @@
 #include "esfa/processing/stream/memory_stream.hpp"
+#include "esfa/interface/errors.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -6,6 +7,19 @@
 #include <string>
 
 namespace esfa::stream {
+
+namespace {
+
+using esfa::StreamError;
+using esfa::StreamErrorKind;
+using esfa::StreamType;
+
+[[noreturn]] void Fail(StreamErrorKind kind, std::string message)
+{
+    throw StreamError(StreamType::Memory, kind, std::move(message));
+}
+
+}  // anonymous namespace
 
 MemoryStream::MemoryStream(const std::vector<uint8_t>& data)
     : mBuffer(reinterpret_cast<const char*>(data.data()),
@@ -47,7 +61,8 @@ void MemoryStream::Seek(int64_t offset, SeekOffsetType seekType)
     int64_t newPos = base + offset;
     if (newPos < 0)
     {
-        throw std::out_of_range("MemoryStream::Seek: negative position");
+        Fail(StreamErrorKind::Seek,
+             "negative position " + std::to_string(newPos));
     }
 
     mPosition = static_cast<size_t>(newPos);
@@ -66,12 +81,12 @@ void MemoryStream::Read(char* dest, size_t length)
     {
         return;
     }
-    if (mPosition + length > mBuffer.size())
+    if (mPosition > mBuffer.size() || length > mBuffer.size() - mPosition)
     {
-        throw std::runtime_error(
-            "MemoryStream::Read: short read (past end of buffer) pos=" +
-            std::to_string(mPosition) + " len=" + std::to_string(length) +
-            " size=" + std::to_string(mBuffer.size()));
+        Fail(StreamErrorKind::EndOfStream,
+             "short read (past end of buffer) pos=" +
+             std::to_string(mPosition) + " len=" + std::to_string(length) +
+             " size=" + std::to_string(mBuffer.size()));
     }
     std::memcpy(dest, mBuffer.data() + mPosition, length);
     mPosition += length;
@@ -81,7 +96,7 @@ int8_t MemoryStream::ReadByte()
 {
     if (mPosition >= mBuffer.size())
     {
-        throw std::runtime_error("MemoryStream::ReadByte: read past end of buffer");
+        Fail(StreamErrorKind::EndOfStream, "read past end of buffer");
     }
     return static_cast<int8_t>(mBuffer[mPosition++]);
 }
