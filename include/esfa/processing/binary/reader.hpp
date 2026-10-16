@@ -38,6 +38,7 @@ public:
 	float ReadSingle();
 	double ReadDouble();
 	std::string ReadString();
+	std::string ReadNullString();
 
 protected:
 	std::shared_ptr<esfa::stream::Stream> stream;

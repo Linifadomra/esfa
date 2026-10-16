@@ -173,4 +173,17 @@ std::string Reader::ReadString()
 	return res;
 }
 
+std::string Reader::ReadNullString()
+{
+	std::string res;
+
+	char curr = 1;
+	while (curr != '\0') {
+		curr = ReadChar();
+		res += curr;
+	}
+
+	return res;
+}
+
 }
