@@ -176,10 +176,9 @@ std::string Reader::ReadString()
 std::string Reader::ReadNullString()
 {
 	std::string res;
+	char curr;
 
-	char curr = 1;
-	while (curr != '\0') {
-		curr = ReadChar();
+	while ((curr = ReadChar()) != '\0') {
 		res += curr;
 	}
 
