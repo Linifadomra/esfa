@@ -1,6 +1,10 @@
 #include "esfa/esfa.hpp"
 
 #include "esfa/processing/stream/file_stream.hpp"
+#include "esfa/processing/stream/memory_stream.hpp"
+
+#include <fstream>
+#include <stdexcept>
 
 namespace esfa {
 
@@ -56,16 +60,23 @@ void Processor::ExportAsset(
 
     try {
         {
-            auto fileStream = std::make_shared<stream::FileStream>(
-                tempFile, stream::FileMode::Write);
+            auto memoryStream = std::make_shared<stream::MemoryStream>();
 
             auto bounded = std::make_shared<stream::BoundedStream>(
-                fileStream, 0, maxSize);
+                memoryStream, 0, maxSize);
 
             binary::Writer writer(bounded);
             writer.SetEndianness(targetEndianness);
             mRegistry.Export(typeKey, writer, std::move(asset), ctx);
             writer.Close();
+
+            const std::vector<uint8_t> bytes = memoryStream->GetBuffer();
+            std::ofstream out(tempFile, std::ios::binary | std::ios::trunc);
+            out.write(reinterpret_cast<const char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
+            out.close();
+            if (!out) {
+                throw std::runtime_error("failed to write '" + tempFile.string() + "'");
+            }
         }
         std::filesystem::rename(tempFile, destFile);
     } catch(...) {
