@@ -78,7 +78,12 @@ void Processor::ExportAsset(
                 throw std::runtime_error("failed to write '" + tempFile.string() + "'");
             }
         }
-        std::filesystem::rename(tempFile, destFile);
+        std::error_code renameError;
+        std::filesystem::rename(tempFile, destFile, renameError);
+        if (renameError) {
+            std::filesystem::remove(destFile);
+            std::filesystem::rename(tempFile, destFile);
+        }
     } catch(...) {
         std::error_code ec;
         std::filesystem::remove(tempFile, ec);
